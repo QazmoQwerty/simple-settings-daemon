@@ -10,7 +10,7 @@ lint: ## Run mypy
 
 .PHONY: test
 test: ## Run a sanity test
-	python3 -m libssettings.scripts.main /tmp/test_ssettings_socket --verbose
+	python3 -m libssettings.scripts.main --socket /tmp/test_ssettings_socket --verbose
 
 .PHONY: build
 build: ## Build the .whl file
@@ -35,4 +35,4 @@ install-docs: ## Install manpage
 
 .PHONY: clean
 clean: ## Clean generated files
-	-rm -rf dist ssettings.egg-info/ .mypy_cache/ dist/ __pycache__/
+	-rm -rf dist simplesettingsdaemon.egg-info/ .mypy_cache/ dist/ __pycache__/

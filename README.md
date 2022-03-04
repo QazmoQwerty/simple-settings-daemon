@@ -1,3 +1,3 @@
 # simple-settings-daemon
 
-Simple, configurable settings daemon for linux.
+Simple settings daemon for linux.

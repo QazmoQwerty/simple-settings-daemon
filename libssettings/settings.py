@@ -1,5 +1,5 @@
 import pprint
-from typing import Dict
+from typing import Dict, List
 
 from libssettings.exceptions import SSettingsError
 

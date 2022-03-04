@@ -30,4 +30,5 @@ class Connection:
         return self._socket.recv(buffsize)
     
     def recv_args(self) -> List[str]:
-        return [arg.decode() for arg in self.recv().split(b'\0') if arg]
+        data = self.recv()
+        return [arg.decode() for arg in data.split(b'\0') if arg]
