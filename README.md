@@ -35,6 +35,12 @@ general commands:
     help          - Show this help message and exit.
     quit          - Ask ssettingsd to suicide.
 
+rule commands:
+    rule KEY int          - Allow only integers for KEY
+    rule KEY int-positive - Allow only positive integers for KEY
+    rule KEY int-negative - Allow only negative integers for KEY
+    rule KEY values VALUE1[,...] - Allow only specific values for KEY (case sensitive!)
+
 hook commands:
     hook new KEY EXEC - Create a new hook (EXEC) for KEY.
     hook reset KEY    - Remove all hook for KEY.

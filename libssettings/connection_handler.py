@@ -3,6 +3,7 @@ import subprocess
 from typing import List, Callable
 
 from libssettings.hooks import Hooks
+from libssettings.rules import Rules, Rule, IntegerRule, PositiveIntegerRule, NegativeIntegerRule, OptionsRule
 from libssettings.logger import Logger
 from libssettings.settings import Settings
 from libssettings.connection import Connection
@@ -24,6 +25,12 @@ general commands:
     help          - Show this help message and exit.
     quit          - Ask ssettingsd to suicide.
 
+rule commands:
+    rule KEY int          - Allow only integers for KEY
+    rule KEY int-positive - Allow only positive integers for KEY
+    rule KEY int-negative - Allow only negative integers for KEY
+    rule KEY values VALUE1[,...] - Allow only specific values for KEY (case sensitive!)
+
 hook commands:
     hook new KEY EXEC - Create a new hook (EXEC) for KEY.
     hook reset KEY    - Remove all hook for KEY.
@@ -34,14 +41,16 @@ hook commands:
 class SSettingsConnectionHandler(ConnectionHandler):
     _settings: Settings
     _hooks: Hooks
+    _rules: Rules
     _logger: Logger
     _socket_path: str
 
-    def __init__(self, logger: Logger, settings: Settings, hooks: Hooks, socket_path: str) -> None:
+    def __init__(self, logger: Logger, settings: Settings, hooks: Hooks, rules: Rules, socket_path: str) -> None:
         self._settings = settings
         self._logger = logger
         self._hooks = hooks
         self._socket_path = socket_path
+        self._rules = rules
     
     def _handle_no_arguments(self, args: List[str], connection: Connection) -> None:
         raise SSettingsError('No arguments given')
@@ -66,8 +75,28 @@ class SSettingsConnectionHandler(ConnectionHandler):
         if len(args) != 3:
             raise SSettingsError('Invalid arguments (expected 2)')
         key, value = args[1], args[2]
+        self._rules.validate(key, value)
         self._settings.set(key, value)
         self._execute_hooks(key, value)
+
+    def _handle_rule(self, args: List[str], connection: Connection) -> None:
+        if len(args) < 3:
+            raise SSettingsError('Invalid arguments (expected at least 2)')
+        key, rule_type = args[1], args[2]
+        rule: Rule
+        if rule_type == 'int':
+            rule = IntegerRule()
+        elif rule_type == 'int-positive':
+            rule = PositiveIntegerRule()
+        elif rule_type == 'int-negative':
+            rule = NegativeIntegerRule()
+        elif rule_type == 'values':
+            if len(args) < 5:
+                raise SSettingsError('Must specify at least 2 options')
+            rule = OptionsRule(set(args[3:]))
+        else:
+            raise SSettingsError(f'Invalid rule type {repr(rule_type)}')
+        self._rules.set(key, rule)
 
     def _handle_dump(self, args: List[str], connection: Connection) -> None:
         if len(args) != 1:
@@ -128,6 +157,7 @@ class SSettingsConnectionHandler(ConnectionHandler):
             'dump': self._handle_dump,
             'help': self._handle_help,
             'quit': self._handle_quit,
+            'rule': self._handle_rule,
             'hook': self._handle_hook,
         }.get(args[0]) or self._handle_unknown_command
     

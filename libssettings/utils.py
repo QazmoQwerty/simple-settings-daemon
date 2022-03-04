@@ -11,3 +11,10 @@ def try_remove_file(path: str) -> None:
 
 def remove_whitespace(string: str) -> str:
     return string.translate(str.maketrans('', '', WHITESPACE))
+
+def is_integer(value: str) -> bool:
+    try: 
+        int(value)
+        return True
+    except ValueError:
+        return False

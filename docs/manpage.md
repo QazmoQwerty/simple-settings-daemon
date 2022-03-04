@@ -1,4 +1,4 @@
-% PALETTE(1) Palette 0.0.1
+% PALETTE(1) Palette 0.0.2
 % Shalev Don Meiri
 % March 4, 2022
 
@@ -50,6 +50,18 @@ help
 
 quit         
 :   Ask `ssettingsd` to suicide.
+
+rule KEY int
+:   Allow only integers for KEY
+
+rule KEY int-positive
+:   Allow only positive integers for KEY
+
+rule KEY int-negative
+:   Allow only negative integers for KEY
+
+rule KEY values VALUE1[,...]
+:   Allow only specific values for KEY (case sensitive!)
 
 hook new KEY EXEC
 :   Create a new hook (EXEC) for KEY.

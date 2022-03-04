@@ -2,6 +2,7 @@ from typing import NamedTuple
 from argparse import ArgumentParser
 
 from libssettings.hooks import Hooks
+from libssettings.rules import Rules
 from libssettings.logger import Logger
 from libssettings.settings import Settings
 from libssettings.version import VERSION
@@ -43,7 +44,8 @@ def run():
     logger = Logger(cmd_arguments.verbose)
     settings = Settings()
     hooks = Hooks()
-    connection_handler = SSettingsConnectionHandler(logger, settings, hooks, cmd_arguments.socket_path)
+    rules = Rules()
+    connection_handler = SSettingsConnectionHandler(logger, settings, hooks, rules, cmd_arguments.socket_path)
     with UnixSocketServer(cmd_arguments.socket_path, connection_handler) as server:
         server.run()
 
